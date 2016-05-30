@@ -1,4 +1,4 @@
-package k8s
+package client
 
 import (
 	"fmt"
@@ -9,15 +9,13 @@ import (
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 )
 
-// Kubeclient is a simplified Kubernetes client
-type Kubeclient struct {
+// Kubernetes is a simplified client
+type Kubernetes struct {
 	client *client.Client
 }
 
-// NewClient creates a new kubernetes client using the config file
-func NewClient(config string) (*Kubeclient, error) {
-
-	// c, err := clientFromFile("/Users/pablomercado/.kube/config")
+// NewKubernetesClient creates a new kubernetes client using the config file
+func NewKubernetesClient(config string) (*Kubernetes, error) {
 
 	cfgFile, err := clientcmd.LoadFromFile(config)
 	if err != nil {
@@ -34,11 +32,11 @@ func NewClient(config string) (*Kubeclient, error) {
 		return nil, fmt.Errorf("error while creating client: %v", err)
 	}
 
-	return &Kubeclient{client}, nil
+	return &Kubernetes{client}, nil
 }
 
 // Namespaces return all kubernetes namespaces
-func (k *Kubeclient) Namespaces() ([]api.Namespace, error) {
+func (k *Kubernetes) Namespaces() ([]api.Namespace, error) {
 
 	n, err := k.client.Namespaces().List(api.ListOptions{})
 	if err != nil {
@@ -49,7 +47,7 @@ func (k *Kubeclient) Namespaces() ([]api.Namespace, error) {
 }
 
 // Pods return pods
-func (k *Kubeclient) Pods(namespace string) ([]api.Pod, error) {
+func (k *Kubernetes) Pods(namespace string) ([]api.Pod, error) {
 
 	p, err := k.client.Pods(namespace).List(api.ListOptions{})
 	if err != nil {
@@ -60,7 +58,7 @@ func (k *Kubeclient) Pods(namespace string) ([]api.Pod, error) {
 }
 
 // ReplicationControllers return replication controllers
-func (k *Kubeclient) ReplicationControllers(namespace string) ([]api.ReplicationController, error) {
+func (k *Kubernetes) ReplicationControllers(namespace string) ([]api.ReplicationController, error) {
 
 	rc, err := k.client.ReplicationControllers(namespace).List(api.ListOptions{})
 	if err != nil {
@@ -72,7 +70,7 @@ func (k *Kubeclient) ReplicationControllers(namespace string) ([]api.Replication
 }
 
 // Deployments return kubernetes deployments
-func (k *Kubeclient) Deployments(namespace string) ([]extensions.Deployment, error) {
+func (k *Kubernetes) Deployments(namespace string) ([]extensions.Deployment, error) {
 
 	ds, err := k.client.Extensions().Deployments(namespace).List(api.ListOptions{})
 	if err != nil {

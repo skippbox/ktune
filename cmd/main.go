@@ -4,23 +4,30 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	// "github.com/odacremolbap/grisou/image"
 	home "github.com/mitchellh/go-homedir"
-	"github.com/odacremolbap/grisou/k8s"
+	"github.com/odacremolbap/grisou/client"
+	"github.com/odacremolbap/grisou/cmd/worker"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
 
 var debug bool
-var dockerhubURL string
+
+//var dockerhubURL string
 var kubeconfig string
+var frequency int
+var namespace string
 
 func init() {
 
+	flag.IntVar(&frequency, "frequency", 10, "Frequency in seconds between deployments/images checks")
+	flag.StringVar(&kubeconfig, "kubeconfig", "", "Path to kubeconfig file")
+	flag.StringVar(&namespace, "namespace", "default", "Namespace where deployments are located")
+	//flag.StringVarP(&dockerhubURL, "dockerhubURL", "u", "", "Dockerhub image URL")
 	flag.BoolVarP(&debug, "debug", "d", false, "enable debug messages")
-	flag.StringVarP(&kubeconfig, "kubeconfig", "k", "", "Path to kubeconfig file")
-	flag.StringVarP(&dockerhubURL, "dockerhubURL", "u", "", "Dockerhub image URL")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: grisou [OPTIONS] \n")
@@ -49,36 +56,53 @@ func main() {
 		kubeconfig = filepath.Join(h, ".kube", "config")
 	}
 
-	c, err := k8s.NewClient(kubeconfig)
+	k, err := client.NewKubernetesClient(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ns, err := c.Namespaces()
+	ns, err := k.Namespaces()
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
+	found := false
 	for _, n := range ns {
-		log.Debugf("namespace found '%v'", n.Name)
+		if n.Name == namespace {
+			found = true
+			break
+		}
+	}
+	if !found {
+		log.Fatalf("Namespace '%s' not found", namespace)
 	}
 
-	rcs, err := c.ReplicationControllers("default")
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
+	d := client.NewDockerHubClient()
 
-	for _, rc := range rcs {
-		log.Debugf("rc found '%v'", rc.Name)
-	}
+	for true {
+		// get kubernetes images
+		images, err := worker.UsedImages(k, namespace)
+		if err != nil {
+			log.Errorf("Failed to get used images from kubernetes: %v", err)
+		}
+		log.Infof("Images found: %#v", images)
 
-	dps, err := c.Deployments("default")
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
+		// get those same images from docker hub
+		for _, i := range images {
+			tag, err := worker.GetLatestTag(d, i)
+			if err != nil {
+				log.Errorf("Failed to get latest tag for image '%s': %v", i, err)
+			}
+			log.Infof("Image latest tag: %#v", tag)
+		}
 
-	for _, dp := range dps {
-		log.Debugf("deployment found '%v'", dp.Name)
+		// compare
+
+		// act
+
+		//wait
+
+		time.Sleep(time.Duration(frequency) * time.Second)
 	}
 
 }
