@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	// "github.com/odacremolbap/grisou/image"
@@ -89,7 +90,14 @@ func main() {
 
 		// get those same images from docker hub
 		for _, i := range images {
-			tag, err := worker.GetLatestTag(d, i)
+
+			t := strings.LastIndex(i, ":")
+			// if using latest (no tag) skip version check
+			if t == -1 {
+				continue
+			}
+
+			tag, err := worker.GetLatestTag(d, i[:strings.LastIndex(i, ":")])
 			if err != nil {
 				log.Errorf("Failed to get latest tag for image '%s': %v", i, err)
 			}

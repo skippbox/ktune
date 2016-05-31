@@ -1,12 +1,18 @@
 package client
 
 import (
-	"io"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 )
+
+// Tag is a docker hub image tag
+type Tag struct {
+	Layer string `json:"layer"`
+	Name  string `json:"name"`
+}
 
 // DockerHub manages Docker hub images
 type DockerHub struct {
@@ -44,12 +50,21 @@ func (c *DockerHub) GetTags(image string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer resp.Body.Close()
 
-	_, err = io.Copy(os.Stdout, resp.Body)
-	if err != nil {
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("URL '%s' returned status %d", u.String(), resp.StatusCode)
+	}
+
+	tags := []Tag{}
+	d := json.NewDecoder(resp.Body)
+	if err = d.Decode(&tags); err != nil {
 		return nil, err
 	}
-	return nil, nil
+
+	t := make([]string, len(tags))
+	for _, tag := range tags {
+		t = append(t, tag.Name)
+	}
+	return t, nil
 }
