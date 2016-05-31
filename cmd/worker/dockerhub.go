@@ -2,7 +2,6 @@ package worker
 
 import (
 	"fmt"
-	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,15 +18,19 @@ func GetLatestTag(client *client.DockerHub, image string) (string, error) {
 	}
 
 	latest := ""
+	latestValue := []int{0, 0, 0}
+
 	for _, tag := range tags {
+
 		// latest is not a version
 		if tag == "latest" {
 			continue
 		}
+		tagValue := getTagValue(tag)
 
-		fmt.Printf("%s:%s\n", image, tag)
-		if getTagValue(tag) > getTagValue(latest) {
+		if isGreaterThan(tagValue, latestValue) {
 			latest = tag
+			latestValue = tagValue
 		}
 	}
 
@@ -35,34 +38,38 @@ func GetLatestTag(client *client.DockerHub, image string) (string, error) {
 
 }
 
-func getTagValue(tag string) int {
+func getTagValue(tag string) []int {
 
 	tagchops := strings.Split(tag, ".")
+	version := []int{0, 0, 0}
 
-	// get first 4 chops
-	if len(tagchops) > 4 {
-		tagchops = tagchops[:4]
+	r := regexp.MustCompile("[^\\d]*(\\d*)?[^\\d]*")
+	for i := range tagchops {
+		// if '-' is present get only the leftmost part
+		// so '2-cross' will be 2
+		// remove
+		c := r.FindStringSubmatch(tagchops[i])[1]
+		v, _ := strconv.Atoi(c)
+		version[i] = v
 	}
 
-	value := 0
-	for i, chop := range tagchops {
+	return version[:3]
+}
 
-		// if an item have a subitem, remove it
-		// we only get the first chunk
-		chop = strings.Split(chop, "-")[0]
+func isGreaterThan(tag1, tag2 []int) bool {
+	if len(tag1) != 3 || len(tag2) != 3 {
+		panic(fmt.Sprintf("Tag values slices must be 3 items long: '%v' ; '%v'", tag1, tag2))
+	}
 
-		// remove non numbers
-		reg := regexp.MustCompile("[^\\d]")
-		chop = reg.ReplaceAll([]byte(chop), "")
-
-		val, err := strconv.Atoi(chop)
-		if err != nil {
-			// should be a integer number
-			panic(err)
+	for i := 0; i < 3; i++ {
+		if tag1[i] > tag2[i] {
+			return true
 		}
-
-		value += int(val * math.Pow(100, float64((len(tagchops)-i))))
+		if tag2[i] > tag1[i] {
+			return false
+		}
 	}
 
-	return value
+	return false
+
 }

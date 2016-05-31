@@ -94,6 +94,7 @@ func main() {
 			t := strings.LastIndex(i, ":")
 			// if using latest (no tag) skip version check
 			if t == -1 {
+				log.Infof("%s is already using latest", i)
 				continue
 			}
 
@@ -101,7 +102,7 @@ func main() {
 			if err != nil {
 				log.Errorf("Failed to get latest tag for image '%s': %v", i, err)
 			}
-			log.Infof("Image latest tag: %#v", tag)
+			log.Infof("%s latest tag: %#v", i, tag)
 		}
 
 		// compare
