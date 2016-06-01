@@ -98,11 +98,26 @@ func main() {
 				continue
 			}
 
-			tag, err := worker.GetLatestTag(d, i[:strings.LastIndex(i, ":")])
+			img := i[:strings.LastIndex(i, ":")]
+			if strings.HasPrefix(img, "gcr.io") {
+				log.Warnf("%s uses gcr.io repository, which is not supported", img)
+				continue
+			}
+
+			if strings.HasPrefix(img, "quay.io") {
+				log.Warnf("%s uses quay.io repository, which is not supported", img)
+				continue
+			}
+
+			tag, err := worker.GetLatestTag(d, img)
 			if err != nil {
 				log.Errorf("Failed to get latest tag for image '%s': %v", i, err)
 			}
 			log.Infof("%s latest tag: %#v", i, tag)
+
+			if i[strings.LastIndex(i, ":"):] != tag {
+				log.Info("Deploying canary for %s", i)
+			}
 		}
 
 		// compare
