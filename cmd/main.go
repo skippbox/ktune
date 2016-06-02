@@ -116,7 +116,7 @@ func main() {
 			log.Infof("%s latest tag: %#v", i, tag)
 
 			if i[strings.LastIndex(i, ":"):] != tag {
-				log.Info("Deploying canary for %s", i)
+				log.Warnf("Deploying canary for %s:%s", img, tag)
 			}
 		}
 

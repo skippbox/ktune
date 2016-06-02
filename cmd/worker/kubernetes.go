@@ -23,6 +23,17 @@ func UsedImages(client *client.Kubernetes, namespace string) ([]string, error) {
 		}
 	}
 
+	ds, err := client.Deployments(namespace)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't get deployments: %v", err)
+	}
+
+	for _, d := range ds {
+		for _, c := range d.Spec.Template.Spec.Containers {
+			images = append(images, c.Image)
+		}
+	}
+
 	return images, nil
 
 }
