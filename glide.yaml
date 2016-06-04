@@ -2,6 +2,7 @@ package: github.com/odacremolbap/grisou
 import:
 - package: github.com/sirupsen/logrus
 - package: github.com/spf13/pflag
+- package: github.com/pkg/errors
 - package: k8s.io/kubernetes
   subpackages:
   - pkg/api

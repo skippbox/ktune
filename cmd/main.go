@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	// "github.com/odacremolbap/grisou/image"
 	home "github.com/mitchellh/go-homedir"
 	"github.com/odacremolbap/grisou/client"
-	"github.com/odacremolbap/grisou/cmd/worker"
+	"github.com/odacremolbap/grisou/worker"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
@@ -49,84 +49,40 @@ func main() {
 
 	log.Info("Starting grisou")
 
-	if kubeconfig == "" {
-		h, err := home.Dir()
-		if err != nil {
-			log.Fatal("Couldn't get home directory. Please, indicate kubeconfig file using flags")
-		}
-		kubeconfig = filepath.Join(h, ".kube", "config")
-	}
-
-	k, err := client.NewKubernetesClient(kubeconfig)
+	dcc, err := createDeploymentCanaryController()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ns, err := k.Namespaces()
-	if err != nil {
-		log.Fatalf("%v", err)
+	for true {
+		log.Debug("Worker iteration at %s", time.Now())
+		time.Sleep(time.Duration(frequency) * time.Second)
+		dcc.Check()
+	}
+}
+
+func createDeploymentCanaryController() (*worker.DeploymentCanaryController, error) {
+
+	if kubeconfig == "" {
+		h, err := home.Dir()
+		if err != nil {
+			return nil, errors.Wrap(err, "couldn't get home directory")
+		}
+		kubeconfig = filepath.Join(h, ".kube", "config")
 	}
 
-	found := false
-	for _, n := range ns {
-		if n.Name == namespace {
-			found = true
-			break
-		}
-	}
-	if !found {
-		log.Fatalf("Namespace '%s' not found", namespace)
+	k, err := client.NewKubernetesClient(kubeconfig, namespace)
+	if err != nil {
+		return nil, errors.Wrap(err, "couldn't create kubernetes client config")
 	}
 
 	d := client.NewDockerHubClient()
 
-	for true {
-		// get kubernetes images
-		images, err := worker.UsedImages(k, namespace)
-		if err != nil {
-			log.Errorf("Failed to get used images from kubernetes: %v", err)
-		}
-		log.Infof("Images found: %#v", images)
-
-		// get those same images from docker hub
-		for _, i := range images {
-
-			t := strings.LastIndex(i, ":")
-			// if using latest (no tag) skip version check
-			if t == -1 {
-				log.Infof("%s is already using latest", i)
-				continue
-			}
-
-			img := i[:strings.LastIndex(i, ":")]
-			if strings.HasPrefix(img, "gcr.io") {
-				log.Warnf("%s uses gcr.io repository, which is not supported", img)
-				continue
-			}
-
-			if strings.HasPrefix(img, "quay.io") {
-				log.Warnf("%s uses quay.io repository, which is not supported", img)
-				continue
-			}
-
-			tag, err := worker.GetLatestTag(d, img)
-			if err != nil {
-				log.Errorf("Failed to get latest tag for image '%s': %v", i, err)
-			}
-			log.Infof("%s latest tag: %#v", i, tag)
-
-			if i[strings.LastIndex(i, ":"):] != tag {
-				log.Warnf("Deploying canary for %s:%s", img, tag)
-			}
-		}
-
-		// compare
-
-		// act
-
-		//wait
-
-		time.Sleep(time.Duration(frequency) * time.Second)
+	dcc, err := worker.NewDeploymentCanaryController(k, d)
+	if err != nil {
+		return nil, errors.Wrap(err, "couldn't create deployment canary controller")
 	}
+
+	return dcc, nil
 
 }
