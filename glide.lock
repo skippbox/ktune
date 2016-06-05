@@ -1,10 +1,8 @@
-hash: 7cbfe1920b957a3e0441532e9f662694bfcdd10fdc854a9f8cf52f8de7ef73cc
-updated: 2016-06-04T17:16:12.182392678+02:00
+hash: 5088b13e3e851cb3a18a609ad4cd2abb6bef0bb34994e3ced97d49d7d43cec31
+updated: 2016-06-05T09:09:24.188154532+02:00
 imports:
-- name: bitbucket.org/ww/goautoneg
-  version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: github.com/beorn7/perks
-  version: b965b613227fddccbfffe13eae360ed3fa822f8d
+  version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
   subpackages:
   - quantile
 - name: github.com/blang/semver
@@ -174,14 +172,15 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: ef7a9a5fb138aa5d3a19988537606226869a0390
+  version: a6ab08426bb262e2d190097751f5cfd1cfdfd17d
   subpackages:
   - expfmt
+  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
   version: 490cc6eb5fa45bf8a8b7b73c8bc82a8160e8531d
 - name: github.com/sirupsen/logrus
-  version: 6d9ae300aaf85d6acd2e5424081c7fcddb21dab8
+  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
 - name: github.com/spf13/pflag
   version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
 - name: github.com/ugorji/go
@@ -235,7 +234,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: a83829b6f1293c91addabc89d0571c246397bbf4
 - name: k8s.io/kubernetes
-  version: a99e4ca79334cefd5fbdd0fd7f78a6b2595f2fde
+  version: 411696d5ef72b8d0b0e87586815dcc1046293ce3
   subpackages:
   - pkg/api
   - pkg/apis/extensions
@@ -270,7 +269,6 @@ imports:
   - pkg/apis/batch/v2alpha1
   - pkg/apis/componentconfig/install
   - pkg/apis/extensions/install
-  - pkg/apis/metrics/install
   - pkg/apis/policy
   - pkg/apis/policy/install
   - pkg/apis/rbac
@@ -309,8 +307,6 @@ imports:
   - pkg/apis/componentconfig
   - pkg/apis/componentconfig/v1alpha1
   - pkg/apis/extensions/v1beta1
-  - pkg/apis/metrics
-  - pkg/apis/metrics/v1alpha1
   - pkg/apis/policy/v1alpha1
   - pkg/apis/rbac/v1alpha1
   - pkg/api/validation
