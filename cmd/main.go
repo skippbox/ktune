@@ -55,7 +55,7 @@ func main() {
 	}
 
 	for true {
-		log.Debug("Worker iteration at %s", time.Now())
+		log.Infof("Worker iteration at %s", time.Now())
 		time.Sleep(time.Duration(frequency) * time.Second)
 		dcc.Check()
 	}
