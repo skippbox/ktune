@@ -42,7 +42,7 @@ func (dcc *DeploymentCanaryController) Check() error {
 
 	for _, d := range ds {
 
-		log.Debugf("Checking Deployment '%s'", d.Name)
+		log.Infof("Checking Deployment '%s'", d.Name)
 
 		// if deployment is already a grisou canary, skip
 		if strings.HasSuffix(d.Name, grisouSuffix) {
@@ -75,22 +75,27 @@ func (dcc *DeploymentCanaryController) Check() error {
 			latest := image.GetLatestTag()
 
 			if it[1] == latest {
-				log.Debugf("image '%s' is already using the latet version", it[0])
+				log.Debugf("image '%s' is already using the latet version", it)
 				continue
 			}
 
 			// create canary deployment
 			deployCanary = true
 			d.Spec.Template.Spec.Containers[i].Image = fmt.Sprintf("%s:%s", it[0], latest)
+			log.Infof("image '%s' is outdated. New canary will update to '%s'", it, d.Spec.Template.Spec.Containers[i].Image)
 		}
 
 		if deployCanary {
 			d.Name = fmt.Sprintf("%s-%s", d.Name, grisouSuffix)
+			log.Infof("Creating new deployment '%s' ", d.Name)
 			d.Spec.Template.Labels["track"] = "canary"
+			d.Spec.Selector = nil
 			d.ResourceVersion = ""
-			dcc.kubernetes.CreateDeployment(&d)
+			_, err = dcc.kubernetes.CreateDeployment(&d)
+			if err != nil {
+				log.Errorf("Deployment '%s' could not be created: %v", d.Name, err)
+			}
 		}
-
 	}
 
 	return nil
