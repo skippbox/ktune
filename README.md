@@ -19,7 +19,7 @@ Still doesn't ...
 
 You will first need a working go build environment set up. [See here for advice](https://golang.org/doc/install)
 
-Clone the repo and ```make````
+Clone the repo and ```make```
 
 Use ```./grisou -h``` to get usage
 
