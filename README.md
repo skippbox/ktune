@@ -3,7 +3,7 @@ Kubernetes canary deployments based on image changes
 
 ## WIP
 
-For now
+For now, Grisou will:
 - Reads kubeconfig file and checks RCs images
 - Looks for images on docker hub (other repos not yet supported)
 - Uses basic tag comparison to detect whether the tag being used is the latest
@@ -18,7 +18,9 @@ Still doesn't ...
 ## Usage
 
 You will first need a working go build environment set up. [See here for advice](https://golang.org/doc/install)
+
 Clone the repo and ```make````
+
 Use ```./grisou -h``` to get usage
 
 Grisou expect a container version tag that can be machine compared, following the pattern
