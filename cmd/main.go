@@ -31,7 +31,7 @@ func init() {
 	flag.BoolVarP(&debug, "debug", "d", false, "enable debug messages")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: grisou [OPTIONS] \n")
+		fmt.Fprintf(os.Stderr, "Usage: ktune [OPTIONS] \n")
 		fmt.Fprintf(os.Stderr, "\nCanary deployer based on Docker hub image changes\n")
 		fmt.Fprintf(os.Stderr, "\nOptions:\n")
 		flag.PrintDefaults()
@@ -47,7 +47,7 @@ func init() {
 
 func main() {
 
-	log.Info("Starting grisou")
+	log.Info("Starting ktune")
 
 	dcc, err := createDeploymentCanaryController()
 	if err != nil {

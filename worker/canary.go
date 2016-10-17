@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const grisouSuffix string = "-grisou"
+const ktuneSuffix string = "-ktune"
 
 // DeploymentCanaryController structure to control kubernetes deployments
 type DeploymentCanaryController struct {
@@ -43,9 +43,9 @@ func (dcc *DeploymentCanaryController) Check() error {
 	dsCanaries := make(map[string]bool, 0)
 	for _, d := range ds {
 		// if deployment is already a grisou canary, skip
-		if strings.HasSuffix(d.Name, grisouSuffix) {
-			grisoued := d.Name[:strings.LastIndex(d.Name, grisouSuffix)]
-			dsCanaries[grisoued] = true
+		if strings.HasSuffix(d.Name, ktuneSuffix) {
+			ktuned := d.Name[:strings.LastIndex(d.Name, ktuneSuffix)]
+			dsCanaries[ktuned] = true
 		}
 	}
 
@@ -54,7 +54,7 @@ func (dcc *DeploymentCanaryController) Check() error {
 		log.Infof("Checking Deployment '%s'", d.Name)
 
 		// if deployment is already a grisou canary, skip
-		if strings.HasSuffix(d.Name, grisouSuffix) {
+		if strings.HasSuffix(d.Name, ktuneSuffix) {
 			log.Debugf("Deployment '%s' is a canary. Skipping", d.Name)
 			continue
 		}
@@ -102,7 +102,7 @@ func (dcc *DeploymentCanaryController) Check() error {
 		}
 
 		if deployCanary {
-			d.Name = fmt.Sprintf("%s%s", d.Name, grisouSuffix)
+			d.Name = fmt.Sprintf("%s%s", d.Name, ktuneSuffix)
 			log.Infof("Creating new deployment '%s' ", d.Name)
 			d.Spec.Template.Labels["track"] = "canary"
 			d.Spec.Selector = nil
