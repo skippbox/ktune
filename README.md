@@ -36,6 +36,18 @@ Still doesn't ...
 
 Use ```./ktune -h``` to get usage
 
+```
+$ ./ktune --debug
+INFO[0000] Starting ktune                               
+INFO[0000] Worker iteration at 2016-10-17 15:19:58.655875145 +0200 CEST 
+INFO[0010] Checking Deployment 'hostname'               
+INFO[0011] Latest tag found to be ''                    
+INFO[0011] image '[runseb/hostname 0.1.0]' is outdated. New canary will update to 'runseb/hostname:latest' 
+INFO[0011] Creating new deployment 'hostname-ktune'     
+```
+
+Watch a new deployment being created and launching Pods.
+
 ktune expect a container version tag that can be machine compared, following the pattern
 Major.Minor.Build-Revision
 
