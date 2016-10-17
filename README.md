@@ -1,18 +1,26 @@
-# Grisou
-Kubernetes canary deployments based on image changes
+# ktune
+Kubernetes Applications Auto-tuning
+
+For example, ktune watches image repository for new images, and triggers canary deployments in k8s.
+It makes sure you are always running the latest images in your deployments.
 
 ## Build
 
 You need glide
 
+You will first need a working go build environment set up. [See here for advice](https://golang.org/doc/install)
+
+Clone the repo and ```make```
+
 ```
+$ git clone https://github.com/skippbox/ktune
 $ glide install
 $ make build
 ```
 
 ## WIP
 
-For now, Grisou will:
+For now, ktune will:
 - Reads kubeconfig file and checks RCs images
 - Looks for images on docker hub (other repos not yet supported)
 - Uses basic tag comparison to detect whether the tag being used is the latest
@@ -26,13 +34,9 @@ Still doesn't ...
 
 ## Usage
 
-You will first need a working go build environment set up. [See here for advice](https://golang.org/doc/install)
+Use ```./ktune -h``` to get usage
 
-Clone the repo and ```make```
-
-Use ```./grisou -h``` to get usage
-
-Grisou expect a container version tag that can be machine compared, following the pattern
+ktune expect a container version tag that can be machine compared, following the pattern
 Major.Minor.Build-Revision
 
 To get the latest image version, grisou:
