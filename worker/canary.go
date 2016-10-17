@@ -89,9 +89,14 @@ func (dcc *DeploymentCanaryController) Check() error {
 
 			// get image latest tag
 			latest := image.GetLatestTag()
+			log.Infof("Latest tag found to be '%s' ", latest)
+	
+			if latest == "" {
+				latest = "latest"
+			}
 
 			if it[1] == latest {
-				log.Debugf("image '%s' is already using the latet version", it)
+				log.Debugf("image '%s' is already using the latest version", it)
 				continue
 			}
 
