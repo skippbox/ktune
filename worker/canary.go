@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/odacremolbap/grisou/client"
+	"github.com/skippbox/ktune/client"
 	"github.com/pkg/errors"
 )
 

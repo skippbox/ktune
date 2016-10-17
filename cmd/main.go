@@ -8,8 +8,8 @@ import (
 
 	// "github.com/odacremolbap/grisou/image"
 	home "github.com/mitchellh/go-homedir"
-	"github.com/odacremolbap/grisou/client"
-	"github.com/odacremolbap/grisou/worker"
+	"github.com/skippbox/ktune/client"
+	"github.com/skippbox/ktune/worker"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"

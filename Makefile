@@ -3,7 +3,7 @@ SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 MAIN := cmd/main.go
 
 RELEASE_DIR=_output
-BINARY=grisou
+BINARY=ktune
 
 .DEFAULT_GOAL: build
 .PHONY: build release clean
