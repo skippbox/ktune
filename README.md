@@ -1,6 +1,15 @@
 # Grisou
 Kubernetes canary deployments based on image changes
 
+## Build
+
+You need glide
+
+```
+$ glide install
+$ make build
+```
+
 ## WIP
 
 For now, Grisou will:
