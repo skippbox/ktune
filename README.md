@@ -18,6 +18,39 @@ $ glide install
 $ make build
 ```
 
+## Example
+
+Create a deployment that you consider _stable_ and give it a label to identify it, for example in a single command:
+
+```
+$ kubectl run hostname --image=runseb/hostname:0.1.0 --labels="run=hostname,track=stable"
+```
+
+Start `ktune`, it will check the deployment and realize that there is an image on the Docker hub with the tag _latest_, it will generate a canary deployment.
+
+```
+$ ./ktune --debug
+INFO[0000] Starting ktune
+INFO[0000] Worker iteration at 2016-10-17 15:19:58.655875145 +0200 CEST
+INFO[0010] Checking Deployment 'hostname'
+INFO[0011] Latest tag found to be ''
+INFO[0011] image '[runseb/hostname 0.1.0]' is outdated. New canary will update to 'runseb/hostname:latest'
+INFO[0011] Creating new deployment 'hostname-ktune'
+```
+
+Check your deployments and resulting pods:
+
+```
+$ kubectl get deployments --show-labels
+NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       LABELS
+hostname         1         1         1            1           26m       run=hostname,track=stable
+hostname-ktune   1         1         1            1           5s        run=hostname,track=canary
+$ kubectl get pods
+NAME                             READY     STATUS    RESTARTS   AGE
+hostname-3656820496-fztby        1/1       Running   0          31m
+hostname-ktune-969058483-k16wj   1/1       Running   0          4m
+```
+
 ## WIP
 
 For now, ktune will:
@@ -35,18 +68,6 @@ Still doesn't ...
 ## Usage
 
 Use ```./ktune -h``` to get usage
-
-```
-$ ./ktune --debug
-INFO[0000] Starting ktune                               
-INFO[0000] Worker iteration at 2016-10-17 15:19:58.655875145 +0200 CEST 
-INFO[0010] Checking Deployment 'hostname'               
-INFO[0011] Latest tag found to be ''                    
-INFO[0011] image '[runseb/hostname 0.1.0]' is outdated. New canary will update to 'runseb/hostname:latest' 
-INFO[0011] Creating new deployment 'hostname-ktune'     
-```
-
-Watch a new deployment being created and launching Pods.
 
 ktune expect a container version tag that can be machine compared, following the pattern
 Major.Minor.Build-Revision
