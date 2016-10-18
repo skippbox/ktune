@@ -109,6 +109,7 @@ func (dcc *DeploymentCanaryController) Check() error {
 		if deployCanary {
 			d.Name = fmt.Sprintf("%s%s", d.Name, ktuneSuffix)
 			log.Infof("Creating new deployment '%s' ", d.Name)
+			d.Labels["track"] = "canary"
 			d.Spec.Template.Labels["track"] = "canary"
 			d.Spec.Selector = nil
 			d.ResourceVersion = ""
